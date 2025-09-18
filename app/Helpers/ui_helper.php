@@ -210,3 +210,15 @@ if (!function_exists('btn_group')) {
         return '<div class="btn-group'.$size.'" role="group">'.$innerHtml.'</div>';
     }
 }
+
+
+if (! function_exists('canAny')) {
+    function canAny(array $perms): bool
+    {
+        if (! function_exists('auth') || ! auth()->user()) return false;
+        foreach ($perms as $p) {
+            if (auth()->user()->can($p)) return true;
+        }
+        return false;
+    }
+}
