@@ -45,6 +45,7 @@ class Filters extends BaseFilters
         'permission'    => \CodeIgniter\Shield\Filters\PermissionFilter::class,
         'force-reset'   => \CodeIgniter\Shield\Filters\ForcePasswordResetFilter::class,
         'jwt'           => \CodeIgniter\Shield\Filters\JWTAuth::class,
+        
     ];
 
     /**
@@ -82,41 +83,29 @@ class Filters extends BaseFilters
      * }
      */
     public array $globals = [
-    'before' => [
-        // CSRF example (keep/adjust as you like)
-        'csrf' => ['except' => ['api/*', 'webhook/*']],
+        'before' => [
+            // Start session BEFORE CSRF
+            'session' => ['except' => [
+                '/', 'home', 'about', 'contact', 'pricing', 'features', 'faq',
+                'privacy', 'terms', 'cookies', 'gdpr',
+                'sitemap.xml', 'robots.txt', 'favicon.ico',
+                'blog', 'blog/*', 'news', 'news/*', 'articles', 'articles/*',
+                'search', 'search/*',
+                'assets/*', 'css/*', 'js/*', 'images/*', 'img/*', 'fonts/*', 'webfonts/*', 'uploads/*',
+                'login', 'logout', 'register',
+                'forgot', 'reset-password', 'reset-password/*',
+                'activate-account', 'activate-account/*',
+                'verify', 'verify/*', 'resend-verification',
+                'magic-link/*', 'auth/*', 'webauthn/*', 'oauth/*',
+                'api/*', 'webhook/*', 'health', 'health/*',
+            ]],
 
-        // Require session auth everywhere EXCEPT these public endpoints
-        'session' => ['except' => [
-            // Core public pages
-            '/', 'home', 'about', 'contact', 'pricing', 'features', 'faq',
+            // CSRF after session
+            'csrf' => ['except' => ['api/*', 'webhook/*']],
+        ],
+        'after' => ['toolbar'],
+    ];
 
-            // Legal & meta
-            'privacy', 'terms', 'cookies', 'gdpr',
-            'sitemap.xml', 'robots.txt', 'favicon.ico',
-
-            // Public content
-            'blog', 'blog/*', 'news', 'news/*', 'articles', 'articles/*',
-            'search', 'search/*',
-
-            // Static assets (only needed if routed via index.php)
-            'assets/*', 'css/*', 'js/*', 'images/*', 'img/*', 'fonts/*', 'webfonts/*', 'uploads/*',
-
-            // Shield auth endpoints
-            'login', 'logout', 'register',
-            'forgot', 'reset-password', 'reset-password/*',
-            'activate-account', 'activate-account/*',
-            'verify', 'verify/*', 'resend-verification',
-            'magic-link/*', 'auth/*', 'webauthn/*', 'oauth/*',
-
-            // APIs & hooks usually don’t use session auth
-            'api/*', 'webhook/*', 'health', 'health/*',
-        ]],
-    ],
-    'after' => [
-        'toolbar',
-    ],
-];
 
     /**
      * List of filter aliases that works on a

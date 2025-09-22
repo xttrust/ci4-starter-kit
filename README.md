@@ -1,68 +1,242 @@
-# CodeIgniter 4 Application Starter
+# 🚀 CodeIgniter 4 Starter Kit
 
-## What is CodeIgniter?
+A modern **CodeIgniter 4 boilerplate** designed to kickstart web projects with a ready-to-use **admin dashboard**, **authentication**, **authorization**, **logging**, and **helpers**.  
+Built with **Bootstrap 5**, **Shield Auth**, and best practices for scalability and security.
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](https://codeigniter.com).
+---
 
-This repository holds a composer-installable app starter.
-It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+## 📑 Table of Contents
 
-More information about the plans for version 4 can be found in [CodeIgniter 4](https://forum.codeigniter.com/forumdisplay.php?fid=28) on the forums.
+- [Features](#-features)
+- [Installation](#-installation)
+- [Database](#-database)
+- [Authentication & Authorization](#-authentication--authorization)
+- [Admin Panel](#-admin-panel)
+- [Layouts & Themes](#-layouts--themes)
+- [Helpers](#-helpers)
+- [Logging](#-logging)
+- [Configuration](#-configuration)
+- [Screenshots](#-screenshots)
+- [Contributing](#-contributing)
+- [License](#-license)
 
-You can read the [user guide](https://codeigniter.com/user_guide/)
-corresponding to the latest version of the framework.
+---
 
-## Installation & updates
+## ✨ Features
 
-`composer create-project codeigniter4/appstarter` then `composer update` whenever
-there is a new release of the framework.
+- ⚡ **CodeIgniter 4.6+** base (latest version)
+- 🔐 **Shield Auth** (user accounts, sessions, identities, groups, permissions)
+- 🎨 **Bootstrap 5 UI** with reusable layouts (`backend.php`, toasts, breadcrumbs)
+- 🛠 **Admin Dashboard** with role-based restrictions
+- 📂 **Migrations & Seeders** for auth tables and activity logs
+- 📝 **Activity Logging** (`user_activity` table + model)
+- 🧩 **Helpers** for flash toasts and UI utilities
+- 🔒 **CSRF protection** enabled globally
+- ✅ **Validation-ready forms** (create/edit users with error feedback)
+- 🔄 **Soft deletes** for users (protects accidental data loss)
+- 🧑‍🤝‍🧑 **User management** (create, edit, delete, toggle status, group assignment)
 
-When updating, check the release notes to see if there are any changes you might need to apply
-to your `app` folder. The affected files can be copied or merged from
-`vendor/codeigniter4/framework/app`.
+---
 
-## Setup
+## ⚙️ Installation
 
-Copy `env` to `.env` and tailor for your app, specifically the baseURL
-and any database settings.
+Clone the repo and install dependencies:
 
-## Important Change with index.php
+```bash
+git clone https://github.com/your-username/ci4-starter-kit.git
+cd ci4-starter-kit
+composer install
+```
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
+Copy the environment file and configure:
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
+```bash
+cp env .env
+```
 
-**Please** read the user guide for a better explanation of how CI4 works!
+Update `.env` with your DB and app config:
 
-## Repository Management
+```dotenv
+CI_ENVIRONMENT = development
+database.default.hostname = localhost
+database.default.database = ci4starter
+database.default.username = root
+database.default.password = root
+database.default.DBDriver = MySQLi
+```
 
-We use GitHub issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
-We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
-FEATURE REQUESTS.
+Run migrations:
 
-This repository is a "distribution" one, built by our release preparation script.
-Problems with it can be raised on our forum, or as issues in the main repository.
+```bash
+php spark migrate
+```
 
-## Server Requirements
+Start local server:
 
-PHP version 8.1 or higher is required, with the following extensions installed:
+```bash
+php spark serve
+```
 
-- [intl](http://php.net/manual/en/intl.requirements.php)
-- [mbstring](http://php.net/manual/en/mbstring.installation.php)
+---
 
-> [!WARNING]
-> - The end of life date for PHP 7.4 was November 28, 2022.
-> - The end of life date for PHP 8.0 was November 26, 2023.
-> - If you are still using PHP 7.4 or 8.0, you should upgrade immediately.
-> - The end of life date for PHP 8.1 will be December 31, 2025.
+## 🛢 Database
 
-Additionally, make sure that the following extensions are enabled in your PHP:
+### Auth Tables (from Shield)
 
-- json (enabled by default - don't turn it off)
-- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php) if you plan to use MySQL
-- [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
+- `users` – core user records
+- `auth_identities` – login identities (email/password)
+- `auth_groups_users` – user-to-group relations
+- `auth_permissions_users` – user-to-permission relations
+- `auth_logins` – login history
+- `auth_remember_tokens`, `auth_token_logins` – session/tokens
+
+### Custom Tables
+
+- `user_activity` – audit log of user actions (admin events, deletes, etc.)
+
+Migration example (`user_activity`):
+
+```sql
+id          BIGINT AUTO_INCREMENT PRIMARY KEY
+user_id     BIGINT NULL
+action      VARCHAR(255)
+ip_address  VARCHAR(45)
+user_agent  TEXT
+created_at  DATETIME NULL
+```
+
+---
+
+## 🔐 Authentication & Authorization
+
+- Built on **CodeIgniter Shield**  
+- Supports **email + password** login  
+- Roles & Permissions:
+  - `superadmin` (full access, cannot be deleted)
+  - `admin` (access to admin zone, restricted CRUD based on permissions)
+  - `user` (default role, no admin access)
+- Permissions enforced via route filters:
+
+  ```php
+  ['filter' => 'permission:users.edit']
+  ```
+
+---
+
+## 🛠 Admin Panel
+
+Accessible at:  
+
+```
+/admin
+```
+
+### Features
+
+- Dashboard (`Admin\Dashboard`)
+- User management (`Admin\Users`)
+  - Create (with email/password + group)
+  - Edit (update username, email, password, group)
+  - Delete (soft delete, prevents self-delete and protects superadmin)
+  - Toggle active/inactive
+- Pagination + search (username/email)
+
+### Restrictions
+
+- Routes grouped under `/admin` with session + permission filters
+- Example:
+
+  ```php
+  $routes->match(['GET','POST'], 'users/(:num)/edit', 'Admin\Users::edit/$1', ['filter' => 'permission:users.edit']);
+  ```
+
+---
+
+## 🎨 Layouts & Themes
+
+- **`layouts/backend.php`** – Admin layout wrapper  
+- **`partials/toasts.php`** – Bootstrap 5 Toasts for flash messages  
+- **Breadcrumbs & tiles** – Consistent UI patterns  
+
+---
+
+## 🧩 Helpers
+
+- **UI Helper** (`ui_helper.php`)
+  - `toast_success($msg)`
+  - `toast_error($msg)`
+  - `toast_info($msg)`
+- Helpers set flashdata consumed by `partials/toasts.php`
+
+---
+
+## 📝 Logging
+
+Two levels of logging are supported:
+
+1. **System Logs** (default CI4)  
+   - Written to `writable/logs/`
+   - Configurable in `Config/Logger.php`
+
+2. **User Activity Logs**  
+   - `user_activity` table + `UserActivityModel`
+   - Inserted from controllers for admin/audit events
+   - Example:
+
+     ```php
+     model(\App\Models\UserActivityModel::class)->insert([
+         'user_id'    => auth()->id(),
+         'action'     => 'Deleted user #5',
+         'ip_address' => $this->request->getIPAddress(),
+         'user_agent' => (string) $this->request->getUserAgent(),
+     ]);
+     ```
+
+---
+
+## ⚙️ Configuration
+
+- **Routes**:  
+  - `app/Config/Routes.php` groups admin routes under `/admin`
+- **Filters**:  
+  - `app/Config/Filters.php` applies `session` and `csrf` globally
+- **Shield**:  
+  - `app/Config/AuthGroups.php` defines groups and permissions
+- **Theme**:  
+  - `app/Libraries/Theme.php` handles admin/backend rendering
+
+---
+
+## 📸 Screenshots
+
+### Admin Dashboard
+
+![Dashboard](docs/screenshots/dashboard.png)
+
+### User Management
+
+![Users](docs/screenshots/users.png)
+
+### Create/Edit Form
+
+![Form](docs/screenshots/form.png)
+
+### Toast Notifications
+
+![Toasts](docs/screenshots/toasts.png)
+
+---
+
+## 🤝 Contributing
+
+1. Fork this repo
+2. Create a feature branch (`git checkout -b feature/new-thing`)
+3. Commit your changes (`git commit -m "Add new thing"`)
+4. Push to branch (`git push origin feature/new-thing`)
+5. Create Pull Request
+
+---
+
+## 📜 License
+
+This project is open-source under the [MIT License](LICENSE).

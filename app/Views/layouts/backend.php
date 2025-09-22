@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="description" content="Vali is a responsive and free admin theme built with Bootstrap 5.">
+  <meta name="description" content="<?= esc($title ?? 'Admin') ?>">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= esc($title ?? 'Admin') ?></title>
 
@@ -59,5 +59,12 @@
   <script src="<?= base_url('themes/admin/Vali/js/main.js') ?>"></script>
 
   <?= $this->renderSection('scripts') ?>
+  <script>
+  setTimeout(() => {
+    document.querySelectorAll('.alert-dismissible').forEach(el => {
+      if (el.classList.contains('show')) el.classList.remove('show');
+    });
+  }, 4000);
+</script>
 </body>
 </html>

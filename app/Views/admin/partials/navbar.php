@@ -8,6 +8,8 @@
   <ul class="app-nav">
     <li class="app-search">
       <form method="get" action="<?= site_url('admin/search') ?>">
+        <?= csrf_field() ?> 
+        
         <input class="app-search__input" type="search" name="q" placeholder="Search">
         <button class="app-search__button" type="submit"><i class="bi bi-search"></i></button>
       </form>
