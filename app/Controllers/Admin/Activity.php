@@ -35,6 +35,14 @@ class Activity extends BaseController
         $model = new UserActivityModel();
         $model->delete((int) $id);
 
+        // Also delete any notifications that were generated from this activity
+        try {
+            $notifModel = new \App\Models\NotificationsModel();
+            $notifModel->where('activity_id', (int) $id)->delete();
+        } catch (\Throwable $e) {
+            log_message('error', 'Failed to delete linked notifications for activity ' . $id . ': ' . $e->getMessage());
+        }
+
         if ($this->request->isAJAX()) {
             return $this->response->setJSON(['ok' => true, 'message' => 'Activity entry deleted']);
         }
@@ -60,8 +68,15 @@ class Activity extends BaseController
         }
 
         $model = new UserActivityModel();
+        $notifModel = new \App\Models\NotificationsModel();
         foreach ($ids as $id) {
-            $model->delete((int) $id);
+            $iid = (int) $id;
+            $model->delete($iid);
+            try {
+                $notifModel->where('activity_id', $iid)->delete();
+            } catch (\Throwable $e) {
+                log_message('error', 'Failed to delete linked notifications for activity ' . $iid . ': ' . $e->getMessage());
+            }
         }
 
         if ($this->request->isAJAX()) {

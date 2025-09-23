@@ -222,10 +222,25 @@
         loadNotifs({ append: true });
       });
 
-      // When opening the dropdown we want to reset pagination and show recent items
+      // When opening the dropdown we want to reset pagination.
+      // If there are no unread notifications, don't load older/read items —
+      // only show a concise 'No unread notifications' message.
       document.getElementById('notifToggle')?.addEventListener('click', ()=>{
         offset = 0;
-        loadNotifs();
+
+        const currentCount = parseInt(badgeEl.textContent || '0', 10) || 0;
+        // If there are unread notifications, load them. Otherwise show friendly message.
+        if (currentCount > 0) {
+          loadNotifs();
+        } else {
+          // Render concise message and hide controls that would load older/read items
+          titleEl.textContent = 'No unread notifications';
+          listEl.innerHTML = '<div class="list-group-item text-muted small">You have no unread notifications.</div>';
+          showMoreBtn?.classList.add('d-none');
+          // Keep mark-all button disabled when there's nothing to mark
+          const markAllBtn = document.querySelector('#notifList')?.parentElement?.nextElementSibling?.querySelector('button[type="submit"]');
+          if (markAllBtn) markAllBtn.disabled = true;
+        }
       });
 
   // Initial fast badge population: fetch unread count first (cheap), then
