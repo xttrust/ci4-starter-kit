@@ -35,7 +35,14 @@ abstract class BaseController extends Controller
      *
      * @var list<string>
      */
-    protected $helpers = ['auth', 'form', 'html', 'url', 'date', 'format', 'ui'];
+    protected $helpers = [
+        // CodeIgniter Helpers
+        'form', 'html', 'url', 'date', 'format', 
+        // Custom Helpers can be added here, e.g. 'activity'
+        'activity',
+        'auth',
+        'ui',
+    ];
 
     /**
      * Be sure to declare properties for any property fetch you initialized.

@@ -7,6 +7,7 @@ use CodeIgniter\HTTP\RedirectResponse;
 use CodeIgniter\Shield\Models\UserModel as ShieldUserModel;
 use CodeIgniter\Shield\Models\UserIdentityModel;
 use CodeIgniter\Shield\Entities\User;
+use App\Models\UserActivityModel;
 
 /**
  * Admin\Users Controller
@@ -195,6 +196,7 @@ class Users extends BaseController
         // Ensure the record exists
         $user = $this->users->find($id);
         if (! $user) {
+            log_activity("Attempted to edit non-existent user #{$id}");
             toast_error('User not found.');
             return redirect()->to(site_url('admin/users'));
         }
@@ -222,7 +224,8 @@ class Users extends BaseController
             if (! $this->validate($rules)) {
                 // Log details for quick diagnosis if needed
                 log_message('error', 'Validation errors: ' . print_r($this->validator->getErrors(), true));
-
+                log_activity("Validation failed when editing user #{$id} : " . json_encode($this->validator->getErrors()));
+                
                 toast_error('Please fix the errors below.');
                 return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
             }
@@ -230,6 +233,8 @@ class Users extends BaseController
             // Update username (check for model errors to avoid silent failures)
             if (! $this->users->update($id, ['username' => $data['username']])) {
                 log_message('error', 'User update failed: ' . json_encode($this->users->errors()));
+                log_activity("Failed to update user #{$id} : " . json_encode($this->users->errors()));
+                
                 toast_error('Failed to update user.');
                 return redirect()->back()->withInput();
             }
@@ -253,6 +258,7 @@ class Users extends BaseController
                     ->where('type', 'email_password')
                     ->set(['secret2' => $hash])
                     ->update();
+                // Note: You might want to invalidate sessions or tokens here
             }
 
             // Group (optional): remove from all known groups and add selected
@@ -264,6 +270,8 @@ class Users extends BaseController
                 }
                 $user->addGroup($data['group']);
             }
+
+            log_activity("Updated user #{$id}");
 
             toast_success('User updated.');
             return redirect()->to(site_url('admin/users'));
@@ -298,33 +306,28 @@ class Users extends BaseController
     {
         $user = $this->users->find($id);
         if (! $user) {
+            log_activity("Attempted to delete non-existent user #{$id}");
             toast_error('User not found.');
             return redirect()->to(site_url('admin/users'));
         }
 
         // Prevent self-delete (accidental lockout)
         if (auth()->id() === $id) {
+            log_activity("Attempted to delete own user #{$id}");
             toast_error('You cannot delete your own account.');
             return redirect()->to(site_url('admin/users'));
         }
 
         // OPTIONAL: Protect superadmin user/role (uncomment to enforce)
-        // if ($user->inGroup('superadmin') || $id === 1) {
-        //     toast_error('Superadmin accounts cannot be deleted.');
-        //     return redirect()->to(site_url('admin/users'));
-        // }
+        if ($user->inGroup('superadmin') || $id === 2) {
+            log_activity("Attempted to delete superadmin user #{$id}");
+            toast_error('Superadmin accounts cannot be deleted.');
+            return redirect()->to(site_url('admin/users'));
+        }
 
         // Soft delete (safer). Purge only from maintenance tooling.
         $this->users->delete($id);
-
-        // OPTIONAL: log the action to user_activity (if model exists)
-        // model(\App\Models\UserActivityModel::class)->insert([
-        //     'user_id'    => auth()->id(),
-        //     'action'     => "Deleted user #{$id} ({$user->username})",
-        //     'ip_address' => $this->request->getIPAddress(),
-        //     'user_agent' => (string) $this->request->getUserAgent(),
-        // ]);
-
+        log_activity("Deleted user #{$id}");
         toast_success('User deleted.');
         return redirect()->to(site_url('admin/users'));
     }
@@ -341,6 +344,7 @@ class Users extends BaseController
     {
         $user = $this->users->find($id);
         if (! $user) {
+            log_activity("Attempted to toggle status of non-existent user #{$id}");
             toast_error('User not found.');
             return redirect()->to(site_url('admin/users'));
         }

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class UserActivity extends Model
+class UserActivityModel extends Model
 {
     protected $table            = 'user_activity';
     protected $primaryKey       = 'id';
