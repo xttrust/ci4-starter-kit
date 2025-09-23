@@ -166,6 +166,12 @@ Accessible at:
   - `toast_success($msg)`
   - `toast_error($msg)`
   - `toast_info($msg)`
+
+- **Activity Helper** (`activity_helper.php`)
+  - `log_activity(string $action, ?int $userId = null): void`
+  - `Will log a message in user_activity table`
+  - `Example: username - Updated group for user #7 to admin`
+
 - Helpers set flashdata consumed by `partials/toasts.php`
 
 ---
@@ -184,12 +190,7 @@ Two levels of logging are supported:
    - Example:
 
      ```php
-     model(\App\Models\UserActivityModel::class)->insert([
-         'user_id'    => auth()->id(),
-         'action'     => 'Deleted user #5',
-         'ip_address' => $this->request->getIPAddress(),
-         'user_agent' => (string) $this->request->getUserAgent(),
-     ]);
+     log_activity("Attempted to edit non-existent user #{$id}");
      ```
 
 ---
