@@ -199,10 +199,10 @@ if (!function_exists('btn_group')) {
      * @return string           HTML <div class="btn-group ...">...</div>
      *
      * @usage
-     *   echo btn_group('
-     *     <a class="btn btn-warning btn-sm" href="#">Edit</a>
-     *     <a class="btn btn-danger  btn-sm" href="#" onclick="return confirm(\'Delete?\')">Delete</a>
-     *   ');
+    *   echo btn_group('
+    *     <a class="btn btn-warning btn-sm" href="#">Edit</a>
+    *     <a class="btn btn-danger  btn-sm" href="#">Delete</a>
+    *   ');
      */
     function btn_group(string $innerHtml, string $size = ''): string
     {

@@ -60,6 +60,79 @@
 
   <?= $this->renderSection('scripts') ?>
   <script>
+  // Expose CSRF token details to client-side JS for robust AJAX requests
+  window.CSRF = {
+    tokenName: '<?= csrf_token() ?>',
+    hash: '<?= csrf_hash() ?>',
+    header: '<?= esc(config('Security')->csrfHeader ?? 'X-CSRF-Token') ?>'
+  };
+
+  /**
+   * confirmModal(options) -> Promise
+   * options: { title, body, confirmText }
+   * Resolves true if confirmed, false otherwise.
+   */
+  function confirmModal(opts){
+    return new Promise((resolve)=>{
+      const title = opts.title || 'Confirm';
+      const body  = opts.body || 'Are you sure?';
+      const confirmText = opts.confirmText || 'Confirm';
+
+      let modalEl = document.getElementById('appConfirmModal');
+      if (!modalEl) {
+        modalEl = document.createElement('div');
+        modalEl.innerHTML = `
+          <div class="modal fade" id="appConfirmModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-sm modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">${title}</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">${body}</div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                  <button type="button" class="btn btn-danger" id="appConfirmOk">${confirmText}</button>
+                </div>
+              </div>
+            </div>
+          </div>`;
+        document.body.appendChild(modalEl);
+        modalEl = document.getElementById('appConfirmModal');
+      }
+
+      // Update contents
+      modalEl.querySelector('.modal-title').textContent = title;
+      modalEl.querySelector('.modal-body').textContent = body;
+      modalEl.querySelector('#appConfirmOk').textContent = confirmText;
+
+      const bsModal = new bootstrap.Modal(modalEl, { backdrop: 'static' });
+      const okBtn = modalEl.querySelector('#appConfirmOk');
+
+      const onOk = () => { cleanup(); resolve(true); };
+      const onHide = () => { cleanup(); resolve(false); };
+      function cleanup(){
+        okBtn.removeEventListener('click', onOk);
+        modalEl.removeEventListener('hidden.bs.modal', onHide);
+        try{ bsModal.hide(); } catch(e){}
+      }
+
+      okBtn.addEventListener('click', onOk);
+      modalEl.addEventListener('hidden.bs.modal', onHide);
+      bsModal.show();
+    });
+  }
+
+  // Global handler: any form with data-confirm attribute will show confirmModal before submitting
+  document.addEventListener('submit', async function(e){
+    const form = e.target;
+    if (form && form.tagName === 'FORM' && form.dataset.confirm) {
+      e.preventDefault();
+      const ok = await confirmModal({ title: 'Confirm', body: form.dataset.confirm, confirmText: 'OK' });
+      if (ok) form.submit();
+    }
+  }, true);
+
   setTimeout(() => {
     document.querySelectorAll('.alert-dismissible').forEach(el => {
       if (el.classList.contains('show')) el.classList.remove('show');

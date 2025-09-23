@@ -40,13 +40,13 @@
               <div class="btn-group btn-group-sm">
                 <?php if (auth()->user()?->can('users.edit')): ?>
                   <a class="btn btn-warning" href="<?= site_url('admin/users/'.$u->id.'/edit') ?>"><i class="bi bi-pencil"></i></a>
-                  <form method="post" action="<?= site_url('admin/users/'.$u->id.'/toggle') ?>" onsubmit="return confirm('Toggle status?')">
+                  <form method="post" action="<?= site_url('admin/users/'.$u->id.'/toggle') ?>" data-confirm="Toggle status?">
                     <?= csrf_field() ?>
                     <button class="btn btn-secondary" type="submit"><i class="bi bi-power"></i></button>
                   </form>
                 <?php endif; ?>
                 <?php if (auth()->user()?->can('users.delete')): ?>
-                  <form method="post" action="<?= site_url('admin/users/'.$u->id.'/delete') ?>" onsubmit="return confirm('Delete user #<?= esc($u->id) ?>?')">
+                  <form method="post" action="<?= site_url('admin/users/'.$u->id.'/delete') ?>" data-confirm="Delete user #<?= esc($u->id) ?>?">
                     <?= csrf_field() ?>
                     <button class="btn btn-danger" type="submit"><i class="bi bi-trash"></i></button>
                   </form>

@@ -183,6 +183,11 @@ Two levels of logging are supported:
 1. **System Logs** (default CI4)  
    - Written to `writable/logs/`
    - Configurable in `Config/Logger.php`
+   - Example:
+
+     ```php
+     log_message('error', 'Validation errors: ' . print_r($this->validator->getErrors(), true));
+     ```
 
 2. **User Activity Logs**  
    - `user_activity` table + `UserActivityModel`
