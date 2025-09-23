@@ -10,6 +10,7 @@
   --deep: #0F4C75;
   --light: #3282B8;
   --pale: #BBE1FA;
+  --accent: #FF6B6B; /* warm accent for highlights */
   --muted: #6c7b84;
   --white: #ffffff;
   --radius: 8px;
@@ -38,10 +39,13 @@ body{
 .nav a{color:var(--pale);text-decoration:none;padding:8px 12px;border-radius:8px;font-weight:600}
 .nav a:hover{background:rgba(255,255,255,0.03)}
 .hero{
-  display:grid;grid-template-columns:1fr 420px;gap:28px;margin-top:34px;align-items:center
+  display:grid;grid-template-columns:1fr 420px;gap:28px;margin-top:34px;align-items:center;
+  background-image: linear-gradient(180deg, rgba(3,9,14,0.36), rgba(3,9,14,0.36)), url('https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=1400&q=80');
+  background-size:cover;background-position:center;border-radius:14px;padding:28px;
 }
 .hero-card{padding:36px;border-radius:14px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:0 12px 30px rgba(2,6,13,0.6);}
 .hero h2{margin:0 0 12px 0;font-size:36px;color:var(--pale);line-height:1.02}
+.hero p.lead{max-width:54ch}
 .hero p.lead{color:var(--pale);opacity:0.95;font-size:16px;margin:0 0 18px}
 .cta-row{display:flex;gap:12px}
 .btn{display:inline-block;padding:12px 18px;border-radius:10px;text-decoration:none;font-weight:700}
@@ -52,6 +56,27 @@ body{
 .feature h4{margin:0 0 6px 0;color:var(--pale)}
 .feature p{margin:0;color:var(--muted)}
 .side-card{padding:24px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));}
+
+/* gallery */
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px}
+.gallery img{width:100%;height:160px;object-fit:cover;border-radius:10px}
+
+/* testimonials */
+.testimonials{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px}
+.testimonial{padding:18px;border-radius:12px;background:linear-gradient(90deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));}
+.testimonial p{margin:0;color:var(--pale)}
+.testimonial cite{display:block;margin-top:10px;color:var(--muted);font-style:normal}
+
+/* pricing */
+.pricing{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}
+.price-card{padding:18px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));border:1px solid rgba(255,255,255,0.03)}
+.price-card h5{margin:0 0 8px 0}
+.price-amount{font-weight:800;color:var(--accent);font-size:20px}
+
+/* faq */
+.faq{margin-top:20px}
+.faq dt{font-weight:700;margin-top:12px}
+.faq dd{margin:6px 0 12px 0;color:var(--muted)}
 .appointment{
   display:flex;flex-direction:column;gap:10px
 }
@@ -87,3 +112,7 @@ hr.separator{border:none;height:1px;background:linear-gradient(90deg, rgba(255,2
 
 /* Make forms accessible focus styles */
 .input:focus, select:focus, textarea:focus{outline:none;box-shadow:0 0 0 4px rgba(50,130,184,0.12);border-color:var(--light)}
+
+/* subtle hover */
+.staff:hover, .price-card:hover, .feature:hover{transform:translateY(-6px);transition:transform .26s cubic-bezier(.2,.8,.2,1)}
+.hero-card{backdrop-filter: blur(6px)}

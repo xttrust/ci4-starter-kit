@@ -23,4 +23,12 @@ $(function(){
     const target = $(this).attr('href');
     $('html,body').animate({scrollTop: $(target).offset().top - 20}, 400);
   });
+  // Initialize AOS (animate on scroll)
+  if (window.AOS) AOS.init({duration:700, once:true, easing:'ease-out-cubic'});
+
+  // GSAP micro animation for logo on load
+  if (window.gsap) {
+    gsap.from('.logo', {y:-12, opacity:0, duration:0.8, ease:'power3.out'});
+    gsap.from('.hero h2', {y:20, opacity:0, duration:0.9, delay:0.2, ease:'power3.out'});
+  }
 });
